@@ -55,10 +55,18 @@ CREATE OR REPLACE VIEW vw_top_productos AS
 SELECT
     p.nombre AS producto,
     SUM(od.cantidad) AS unidades_vendidas,
-    RANK() OVER (ORDER BY SUM(od.cantidad) DESC) AS ranking
+    SUM(od.subtotal) AS ingresos_totales,
+    RANK() OVER (ORDER BY SUM(od.cantidad) DESC) AS ranking,
+    CASE
+        WHEN SUM(od.cantidad) > 100 THEN 'Estrella'
+        WHEN SUM(od.cantidad) > 50 THEN 'Alto'
+        ELSE 'Regular'
+    END AS nivel_producto
 FROM orden_detalles od
 JOIN productos p ON p.id = od.producto_id
-GROUP BY p.nombre;
+GROUP BY p.nombre
+HAVING SUM(od.cantidad) > 0;
+
 
 
 -- ============================================
@@ -100,5 +108,10 @@ CREATE OR REPLACE VIEW vw_ventas_acumuladas AS
 SELECT
     fecha,
     total_ventas AS total_dia,
-    SUM(total_ventas) OVER (ORDER BY fecha) AS total_acumulado
+    SUM(total_ventas) OVER (ORDER BY fecha) AS total_acumulado,
+    LAG(total_ventas) OVER (ORDER BY fecha) AS ventas_dia_anterior,
+    total_ventas - COALESCE(
+        LAG(total_ventas) OVER (ORDER BY fecha), 0
+    ) AS variacion_diaria
 FROM vw_ventas_por_dia;
+
