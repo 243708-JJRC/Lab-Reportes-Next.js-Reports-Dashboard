@@ -1,18 +1,22 @@
 import { pool } from "../db";
 
-export interface VentasPorDia {
-  fecha: Date;
-  total_ordenes: number;
-  total_ventas: number;
-  ticket_promedio: number;
-}
+export async function getVentasPorDia(date: string) {
 
-export async function getVentasPorDia(): Promise<VentasPorDia[]> {
-  const { rows } = await pool.query(`
+  const { rows } = await pool.query(
+    `
     SELECT fecha, total_ordenes, total_ventas, ticket_promedio
     FROM vw_ventas_por_dia
-    ORDER BY fecha DESC
-  `);
+    WHERE fecha = $1::date
+    `,
+    [date]
+  );
 
-  return rows;
+  const kpi = rows.length > 0
+    ? rows[0].total_ventas
+    : 0;
+
+  return {
+    data: rows,
+    kpi
+  };
 }

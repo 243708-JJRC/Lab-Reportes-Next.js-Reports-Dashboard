@@ -1,28 +1,43 @@
-import { pool } from "../../lib/db";
+import { getTicketPromedioCategoria } from "../../lib/services/reporte4";
 
 export default async function Reporte4() {
-  const { rows } = await pool.query(
-    "SELECT * FROM vw_ticket_promedio_categoria ORDER BY ticket_promedio DESC"
-  );
+  const { data, kpi } = await getTicketPromedioCategoria();
 
   return (
-    <main>
-      <h1>Ticket promedio por categoría</h1>
+    <main className="report-container">
+      <h1 className="report-title">
+        Ticket Promedio por Categoría
+      </h1>
 
-      <table>
+      <p className="report-description">
+        Este reporte permite analizar el valor promedio de compra por categoría,
+        identificando qué tipo de productos generan mayor ingreso por orden.
+      </p>
+
+      {kpi && (
+        <div className="kpi-card">
+          Categoría con mayor ticket promedio
+          <p>
+            {kpi.categoria} — $
+            {Number(kpi.ticket_promedio).toFixed(2)}
+          </p>
+        </div>
+      )}
+
+      <table className="report-table">
         <thead>
           <tr>
             <th>Categoría</th>
-            <th>Total ingresos</th>
+            <th>Total Ingresos</th>
             <th>Órdenes</th>
-            <th>Ticket promedio</th>
+            <th>Ticket Promedio</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => (
+          {data.map((r) => (
             <tr key={r.categoria}>
               <td>{r.categoria}</td>
-              <td>${r.total_ingresos}</td>
+              <td>${Number(r.total_ingresos).toFixed(2)}</td>
               <td>{r.total_ordenes}</td>
               <td>${Number(r.ticket_promedio).toFixed(2)}</td>
             </tr>

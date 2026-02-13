@@ -1,25 +1,73 @@
+import { singleDateSchema } from "../../lib/validators";
 import { getVentasPorDia } from "../../lib/services/reporte1";
 
-export default async function Reporte1() {
-  const rows = await getVentasPorDia();
+export default async function Reporte1({ searchParams }: any) {
 
-  const totalVentas = rows.reduce(
-    (acc, r) => acc + Number(r.total_ventas),
-    0
-  );
+  const sParams = await searchParams;
+
+  const validation = singleDateSchema.safeParse({
+    date: sParams.date,
+  });
+
+  if (!sParams.date) {
+    return (
+      <main className="report-container">
+        <h1 className="report-title">Ventas por día</h1>
+
+        <p className="report-description">
+          Selecciona una fecha para consultar las ventas registradas.
+        </p>
+
+        <form method="GET" className="filter-form">
+          <div className="form-group">
+            <label>Fecha</label>
+            <input type="date" name="date" required />
+          </div>
+
+          <button type="submit" className="filter-btn">
+            Consultar
+          </button>
+        </form>
+      </main>
+    );
+  }
+
+  if (!validation.success) {
+    return (
+      <main className="report-container">
+        <h1 className="report-title">Ventas por día</h1>
+        <p>Fecha inválida.</p>
+      </main>
+    );
+  }
+
+  const { date } = validation.data;
+
+  const { data, kpi } = await getVentasPorDia(date);
 
   return (
     <main className="report-container">
       <h1 className="report-title">Ventas por día</h1>
 
       <p className="report-description">
-        Este reporte muestra el comportamiento diario de ventas, número de órdenes
-        y ticket promedio. Permite identificar tendencias de ingreso y días de mayor rendimiento.
+        Este reporte muestra el total de órdenes, ventas y ticket promedio
+        para la fecha seleccionada.
       </p>
 
+      <form method="GET" className="filter-form">
+        <div className="form-group">
+          <label>Fecha</label>
+          <input type="date" name="date" defaultValue={date} required />
+        </div>
+
+        <button type="submit" className="filter-btn">
+          Consultar
+        </button>
+      </form>
+
       <div className="kpi-card">
-        <h3>Total acumulado</h3>
-        <p>${totalVentas.toFixed(2)}</p>
+        Total vendido ese día
+        <p>${Number(kpi).toFixed(2)}</p>
       </div>
 
       <table className="report-table">
@@ -32,7 +80,7 @@ export default async function Reporte1() {
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => (
+          {data.map((r) => (
             <tr key={r.fecha.toString()}>
               <td>{new Date(r.fecha).toLocaleDateString()}</td>
               <td>{r.total_ordenes}</td>

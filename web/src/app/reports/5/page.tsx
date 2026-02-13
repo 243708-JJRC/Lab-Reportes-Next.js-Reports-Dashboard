@@ -1,33 +1,38 @@
-import { pool } from "../../lib/db";
+import { getVentasAcumuladas } from "../../lib/services/reporte5";
 
 export default async function Reporte5() {
-  const { rows } = await pool.query(
-    "SELECT * FROM vw_ventas_acumuladas ORDER BY fecha"
-  );
-
-  const ultimo = rows[rows.length - 1];
+  const { data, kpi } = await getVentasAcumuladas();
 
   return (
-    <main>
-      <h1>Ventas acumuladas</h1>
-      <p>
-        Total histórico: <strong>${ultimo?.total_acumulado ?? 0}</strong>
+    <main className="report-container">
+      <h1 className="report-title">Ventas Acumuladas</h1>
+
+      <p className="report-description">
+        Este reporte muestra la evolución acumulada de las ventas en el tiempo,
+        permitiendo visualizar el crecimiento histórico del negocio día a día.
       </p>
 
-      <table>
+      {kpi && (
+        <div className="kpi-card">
+          Total histórico acumulado:
+          <p>${Number(kpi.total_historico).toFixed(2)}</p>
+        </div>
+      )}
+
+      <table className="report-table">
         <thead>
           <tr>
             <th>Fecha</th>
-            <th>Total día</th>
-            <th>Acumulado</th>
+            <th>Total Día</th>
+            <th>Total Acumulado</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => (
+          {data.map((r) => (
             <tr key={r.fecha.toString()}>
               <td>{new Date(r.fecha).toLocaleDateString()}</td>
-              <td>${r.total_dia}</td>
-              <td>${r.total_acumulado}</td>
+              <td>${Number(r.total_dia).toFixed(2)}</td>
+              <td>${Number(r.total_acumulado).toFixed(2)}</td>
             </tr>
           ))}
         </tbody>

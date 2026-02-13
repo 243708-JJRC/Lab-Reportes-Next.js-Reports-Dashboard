@@ -1,24 +1,42 @@
+import { paginationSchema } from "../../lib/validators";
 import { getVentasPorCategoria } from "../../lib/services/reporte2";
+import { PaginationControls } from "../../lib/components/pagination";
 
-export default async function Reporte2() {
-  const rows = await getVentasPorCategoria();
+export default async function Reporte2({ searchParams }: any) {
 
-  const topCategoria = rows[0];
+   const params = await searchParams;
+
+  const validation = paginationSchema.safeParse({
+    page: params.page ?? 1,
+    limit: searchParams.limit ?? 5,
+  });
+
+  if (!validation.success) {
+    return <div>Parámetros inválidos</div>;
+  }
+
+  const { page, limit } = validation.data;
+
+  const { data, totalPages, kpi } =
+    await getVentasPorCategoria(page, limit);
 
   return (
     <main className="report-container">
-      <h1 className="report-title">Ventas por Categoría</h1>
+      <h1 className="report-title">Ventas por categoría</h1>
 
       <p className="report-description">
         Este reporte muestra el desempeño comercial por categoría,
-        clasificando el nivel de ventas según el volumen de ingresos
-        generados.
+        clasificando el nivel de ventas según el volumen de ingresos generados.
       </p>
 
-      {topCategoria && (
+      {kpi && (
         <div className="kpi-card">
-          Categoría líder: {topCategoria.categoria}
-          <p>${Number(topCategoria.ingresos).toFixed(2)}</p>
+          Categoría líder:
+          <p>
+            {kpi.categoria}
+            <br />
+            ${Number(kpi.ingresos).toFixed(2)}
+          </p>
         </div>
       )}
 
@@ -27,12 +45,12 @@ export default async function Reporte2() {
           <tr>
             <th>Categoría</th>
             <th>Ingresos</th>
-            <th>Unidades Vendidas</th>
-            <th>Nivel de Ventas</th>
+            <th>Unidades</th>
+            <th>Nivel</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => (
+          {data.map((r) => (
             <tr key={r.categoria}>
               <td>{r.categoria}</td>
               <td>${Number(r.ingresos).toFixed(2)}</td>
@@ -42,6 +60,8 @@ export default async function Reporte2() {
           ))}
         </tbody>
       </table>
+
+      <PaginationControls page={page} totalPages={totalPages} />
     </main>
   );
 }
