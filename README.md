@@ -207,7 +207,6 @@ Mitigación: control centralizado.
 
 ## Bitacora de IA
 **Prompts clave utilizados:**
-- Inserta datos en las siguientes tablas, guiandote de los datos ya existentes.
 - Error en el paginado, no me aparece los datos
 - Cómo estructurar paginación server-side en PostgreSQL.
 - Cómo crear roles dinámicos usando variables de entorno en Postgres.
