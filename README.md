@@ -48,8 +48,9 @@ Los índices se definen en un archivo separado (`indexes.sql`) para optimizar co
 ---
 
 ## Levantar el proyecto
-- docker compose up --build
-
+```bash
+docker compose up --build
+```
 ---
 
 ## Reportes
