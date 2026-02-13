@@ -212,6 +212,7 @@ Mitigación: control centralizado.
 - Cómo estructurar paginación server-side en PostgreSQL.
 - Cómo crear roles dinámicos usando variables de entorno en Postgres.
 - Interpreta los siguientes EXPLAIN ANALYZE.
+- Como agregar healthcheck para el docker compose
 
 
 **Qué se validó:**
@@ -219,6 +220,7 @@ Mitigación: control centralizado.
 - Que el rol tuviera únicamente permisos SELECT.
 - Que las consultas usaran parámetros y no concatenación.
 - Que las variables de entorno se cargaran correctamente en Docker.
+- Que la app arranque hasta que Postgres esté listo.
 
 **Qué se corrigió:**
 - Error al cargar los datos al paginarlos

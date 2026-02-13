@@ -11,6 +11,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "${DB_PORT}:5432"
 
@@ -21,4 +26,5 @@ services:
     ports:
       - "${WEB_PORT}:3000"
     depends_on:
-      - db
+      db:
+       condition: service_healthy
