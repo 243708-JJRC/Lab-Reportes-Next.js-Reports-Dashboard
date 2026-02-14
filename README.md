@@ -48,7 +48,7 @@ Los índices se definen en un archivo separado (`indexes.sql`) para optimizar co
 ---
 
 ## Levantar el proyecto
-Crear el archivo .env en la carpeta raiz, colocar las variables que estan en reporte PDF entregado en la asignación de classroom.
+Crear el archivo .env en la carpeta raiz, colocar las variables que estan en reporte PDF entregado y enviadas a su correp institucional.
 
 Ejecutar el siguiente comando en la raiz del proyecto:
 ```bash
